@@ -1,0 +1,235 @@
+		ORG 0000H	
+START:	MOV A,#01H
+		LCALL CMD
+		
+START1:	MOV P0,#00H			;INITIALIZING P0,P1,P2,P3
+		MOV P1,#00H
+		MOV P2,#00H
+		MOV P3,#00H
+		MOV TMOD,#21H 		;TIMER 0 MODE 1 & TIMER 1 MODE 2
+		MOV TH1,#0FDH      	;TIMER 1 IS USED TO SET BAUD RATE(9600)		
+		MOV TL1,#0FDH
+		MOV SCON,#50H       
+
+		SETB TR1              
+		
+HERE:	JNB P3.5,HERE		;P3.5 = PIR SENSOR
+		SETB P2.0			;P2.0 = BUZZER/ALARM
+		LCALL TEXT
+		LCALL SMS
+		LJMP START
+
+TEXT:	MOV A,#38H			;LCD INITIALIZING
+		LCALL CMD
+		MOV A,#0EH
+		LCALL CMD
+		MOV A,#01H
+		LCALL CMD
+		MOV A,#06H
+		LCALL CMD
+		MOV A,#80H
+		LCALL CMD
+		MOV A,#'I'			;MESSAGE
+		LCALL DISP
+		MOV A,#'N'
+		LCALL DISP
+		MOV A,#'T'
+		LCALL DISP
+		MOV A,#'R'
+		LCALL DISP
+		MOV A,#'U'
+		LCALL DISP
+		MOV A,#'D'
+		LCALL DISP
+		MOV A,#'E'
+		LCALL DISP
+		MOV A,#'R'
+		LCALL DISP
+		MOV A,#' '
+		LCALL DISP
+		MOV A,#'A'
+		LCALL DISP
+		MOV A,#'L'
+		LCALL DISP
+		MOV A,#'A'
+		LCALL DISP
+		MOV A,#'R'
+		LCALL DISP
+		MOV A,#'M'
+		LCALL DISP
+		MOV A,#0C3H
+		LCALL CMD
+		MOV A,#'A'
+		LCALL DISP
+		MOV A,#'L'
+		LCALL DISP
+		MOV A,#'E'
+		LCALL DISP
+		MOV A,#'R'
+		LCALL DISP
+		MOV A,#'T'
+		LCALL DISP
+		MOV A,#'!'
+		LCALL DISP
+		MOV A,#'!'
+		LCALL DISP
+		MOV A,#'!'
+		LCALL DISP		
+		RET
+
+CMD:	MOV P0,A
+		MOV P1,#0F4H
+		LCALL DELAY
+		MOV P1,#0F0H
+		LCALL DELAY
+		RET
+		
+DISP:	MOV P0,A
+		MOV P1,#0F5H
+		LCALL DELAY
+		MOV P1,#0F1H
+		LCALL DELAY
+		RET
+		
+DELAY:	MOV A,#0FFH
+BACK:	DEC A
+		JNZ BACK
+		RET
+			
+SMS:	MOV A,#'A'			;AT (TO CHECK THE GSM)
+		LCALL SEND
+		MOV A,#'T'
+		LCALL SEND
+		MOV A,#0DH        				
+    		LCALL SEND
+		LCALL DELAY1
+		
+		MOV A,#'A'			;AT+CMGF=1(CONFIGURE IN SMS MODE)
+		LCALL SEND
+		MOV A,#'T'
+		LCALL SEND
+		MOV A,#'+'
+		LCALL SEND
+		MOV A,#'C'
+		LCALL SEND
+		MOV A,#'M'
+		LCALL SEND
+		MOV A,#'G'
+		LCALL SEND
+		MOV A,#'F'
+		LCALL SEND
+		MOV A,#'='
+		LCALL SEND
+		MOV A,#'1'
+		LCALL SEND
+		MOV A,#0DH        				
+    		LCALL SEND        
+		LCALL DELAY1
+		
+		MOV A,#'A'				;AT+CMGS=”8898518379”
+		LCALL SEND			;TO SEND THE MOBILE NUMBER
+		MOV A,#'T'
+		LCALL SEND
+		MOV A,#'+'
+		LCALL SEND
+		MOV A,#'C'
+		LCALL SEND
+		MOV A,#'M'
+		LCALL SEND
+		MOV A,#'G'
+		LCALL SEND
+		MOV A,#'S'
+		LCALL SEND
+		MOV A,#'='
+		LCALL SEND
+		MOV A,#22H
+		LCALL SEND
+		MOV A,#'+'
+		LCALL SEND
+		MOV A,#'9'
+		LCALL SEND
+		MOV A,#'1'
+		LCALL SEND
+		MOV A,#'8'
+		LCALL SEND
+		MOV A,#'8'
+		LCALL SEND
+		MOV A,#'9'
+		LCALL SEND
+		MOV A,#'8'
+		LCALL SEND
+		MOV A,#'5'
+		LCALL SEND
+		MOV A,#'1'
+		LCALL SEND
+		MOV A,#'8'
+		LCALL SEND
+		MOV A,#'3'
+		LCALL SEND
+		MOV A,#'7'
+		LCALL SEND
+		MOV A,#'9'
+		LCALL SEND
+		MOV A,#22H
+		LCALL SEND
+		MOV A,#0DH        				
+    		LCALL SEND
+		LCALL DELAY1
+		
+		MOV A,#'I'				;MESSAGE
+		LCALL SEND
+		MOV A,#'N'
+		LCALL SEND
+		MOV A,#'T'
+		LCALL SEND
+		MOV A,#'R'
+		LCALL SEND
+		MOV A,#'U'
+		LCALL SEND
+		MOV A,#'D'
+		LCALL SEND
+		MOV A,#'E'
+		LCALL SEND
+		MOV A,#'R'
+		LCALL SEND
+		MOV A,#' '
+		LCALL SEND
+		MOV A,#'A'
+		LCALL SEND
+		MOV A,#'L'
+		LCALL SEND
+		MOV A,#'E'
+		LCALL SEND
+		MOV A,#'R'
+		LCALL SEND
+		MOV A,#'T'
+		LCALL SEND
+		MOV A,#'!'
+		LCALL SEND
+		MOV A,#'!'
+		LCALL SEND
+		MOV A,#'!'
+		LCALL SEND
+		LCALL DELAY1
+		
+		MOV A,#1AH			;CTRL+Z 
+		LCALL SEND			;TO SEND THE MESSAGE
+		LCALL DELAY1
+		RET
+		
+SEND:		MOV SBUF,A
+LOOP:		JNB TI,LOOP
+		CLR TI
+		RET
+		
+DELAY1:	MOV R6,#0FH        			 
+BACK1: 	MOV TH0,#00H  				
+      		MOV TL0,#00H				  
+      		SETB TR0            				     
+HERE2: 	JNB TF0,HERE2      			   
+      		CLR TR0             				          
+      		CLR TF0             				    
+      		DJNZ R6,BACK1       				
+      		RET                 
+
+		END
